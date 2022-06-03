@@ -1,1 +1,187 @@
-Hello
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=euc-jp">
+<title>本棚衰弱!</title>
+</head>
+<body>
+<div id="panel"></div>
+<div id="tries" style="font-size:30pt;position:absolute;"></div>
+
+<script type="text/javascript">
+
+var BOOKHEIGHT = 100;
+var BOOKWIDTH = BOOKHEIGHT * 0.7;
+
+var COLS = 4;
+var ROWS = 4;
+
+var isbns = [
+'4101001545',	//海辺のカフカ
+'4101001413',	//ねじまき鳥
+
+'4150502366',	//ワンダフルライフ
+'4150502676',	//フラミンゴの微笑
+
+'4061496271',	//インタビュー術	講談社
+'4061496891',	//時間の分子生物学
+
+'4167443023',	//カルト資本主義 斎藤たかお
+'4167443031',	//機会不平等
+
+'0345481720',	//のだめ
+'0345481739',	//のだめ
+
+'4197735812',	//ナウシカ
+'1591164087',	//NAUSICAA
+
+'4091847315',	//鉄コン
+'4091857345',	//青い
+
+'4480422536',	//シリコンバレー精神
+'4480062858',	//Web進化論
+
+'4480034420',	//ダンドリ
+'4480034439',
+
+'4004304164',	//岩波
+'400430508X',
+
+'4101174156',	//影武者徳川家康
+'4101174164'
+];
+
+var id = [];
+var open = [];
+var images = [];
+
+function initialize(){
+  for(var i=0;i<COLS*ROWS;i++){
+    open[i] = false;
+    id[i] = Math.floor(i/2);
+  }
+}
+
+var state = 0;
+var selectedind;
+var selectedid;
+var tries = 0;
+
+function mousedown(ev){
+  var e;
+  if(ev) e = ev.target;
+  if(! e) e = event.srcElement; // IE
+  var ind = e.ind
+
+  if(state == 0){
+    open[ind] = true;
+    selectedind = ind;
+    selectedid = id[ind];
+    state = 1;
+    display();
+  }
+  else {
+    if(ind == selectedind){
+      // alert('same sel');
+    }
+    else {
+      setTimeout('display()',1500);
+      open[ind] = true;
+      display();
+      if(id[ind] == selectedid){ // 成功!
+      }
+      else {
+        open[selectedind] = false;
+        open[ind] = false;
+        tries += 1;
+        t = document.getElementById('tries');
+        t.innerHTML = tries;
+      }
+      state = 0;
+    }
+  }
+//  display();
+}
+
+function setup(){
+  var panel = document.getElementById('panel');
+  for(var y=0;y<ROWS;y++){
+    for(var x=0;x<COLS;x++){
+      var ind = y * COLS + x;
+      var img = document.createElement('img')
+      img.src = isbns[ind] + ".jpg"
+      img.height = BOOKHEIGHT;
+      img.width = 80;
+//      img.style.position = 'absolute';
+//      img.style.left = x * BOOKWIDTH;
+//      img.style.top = y * BOOKHEIGHT;
+      img.style.visibility = 'visible';
+//      img.style.backgroundColor = 'yellow';
+      img.style.margin = '0px 0px 0px 0px';
+//    img.style.padding = '0 0 0 0';
+      img.ind = ind;
+      images[ind] = img;
+
+      var d = document.createElement('div');
+      d.style.backgroundColor = ((x+y) % 2 == 0 ? '#eee' : '#ccc');
+      d.style.margin = '20px 20px 20px 20px';
+      d.style.padding = '0';
+      d.style.position = 'absolute';
+      d.style.left = x * BOOKHEIGHT;
+      d.style.top = y * BOOKHEIGHT;
+      d.style.height = BOOKHEIGHT;
+      d.style.width = BOOKHEIGHT;
+      d.ind = ind;
+      d.onmousedown = mousedown;
+
+      var c = document.createElement('center');
+
+      d.appendChild(img);
+      c.appendChild(d);
+      panel.appendChild(c);
+    }
+  }
+    t = document.getElementById('tries');
+    t.style.left = 20;
+    t.style.top = BOOKHEIGHT * ROWS + 40;
+    t.innerHTML = tries;
+}
+
+function display(){
+  for(var i=0;i<ROWS*COLS;i++){
+    images[i].style.visibility = (open[i] ? 'visible' : 'hidden');
+  }
+}
+
+function swap(a,i,j){
+  var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+}
+
+function shuffle(){
+  var len = ROWS * COLS;
+  for(var i=0;i<len-1;i++){
+    var ind = i + Math.floor(Math.random() * (len-i));
+    swap(isbns,i,ind);
+    swap(id,i,ind);
+  }
+}
+
+function select(){
+  var len = Math.floor(isbns.length/2);
+  for(var i=0;i<len-1;i++){
+    var ind = i + Math.floor(Math.random() * (len-i));
+    swap(isbns,i*2,ind*2);
+    swap(isbns,i*2+1,ind*2+1);
+  }
+}
+
+initialize();
+select();
+shuffle();
+setup();
+display();
+
+</script>
+
+
+</body>
+</html>
